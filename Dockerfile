@@ -20,6 +20,11 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustc --version && cargo --version
 
+# Install Rust Nightly
+RUN rustup toolchain install nightly
+RUN rustup default nightly
+RUN rustup component add rust-src
+
 # Install other Weenix dependencies
 RUN apt-get install grub2-common gdb -y
 
