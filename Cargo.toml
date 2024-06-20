@@ -12,3 +12,7 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
+
+[lib]
+name = "reenix"
+path = "src/reenix.rs"

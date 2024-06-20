@@ -26,7 +26,7 @@ RUN rustup default nightly
 RUN rustup component add rust-src
 
 # Install other Weenix dependencies
-RUN apt-get install grub2-common gdb -y
+RUN apt-get install grub2-common gdb qemu-system -y
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
