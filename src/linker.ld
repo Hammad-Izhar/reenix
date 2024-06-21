@@ -6,9 +6,9 @@ SECTIONS
 
     .multiboot :
     {
-        KEEP(.multiboot)
+        KEEP(*(.multiboot))
     }
-
+    
     .text :
     {
         *(.text .text.*)
@@ -18,6 +18,4 @@ SECTIONS
     .data : { *(.data .data.*) }
 
     .bss : { *(.bss .bss.*) }
-
-    /DISCARD/ : { *(.eh_frame) }
 }

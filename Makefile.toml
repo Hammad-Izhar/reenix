@@ -1,0 +1,35 @@
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.compile-kernel]
+command = "cargo"
+args = ["build"]
+
+[tasks.build-iso]
+script = '''
+# Move the executable to the GRUB iso directory
+cp target/x86_64-reenix/debug/reenix iso/boot
+
+# Rename the executable
+mv iso/boot/reenix iso/boot/reenix.bin
+
+# Create the iso
+grub-mkrescue -o reenix.iso iso
+'''
+
+[tasks.build]
+dependencies = ["format", "compile-kernel", "build-iso"]
+
+[tasks.run]
+script = '''
+qemu-system-x86_64 -cdrom reenix.iso
+'''
+dependencies = ["build"]
+
+[tasks.debug]
+script = '''
+qemu-system-x86_64 -cdrom reenix.iso
+'''
+dependencies = ["build"]
