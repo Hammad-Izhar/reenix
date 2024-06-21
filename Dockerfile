@@ -25,9 +25,6 @@ RUN rustup toolchain install nightly
 RUN rustup default nightly
 RUN rustup component add rust-src
 
-# Install cargo-make
-RUN cargo install cargo-make
-
 # Install other Weenix dependencies
 RUN apt-get install grub2-common grub-pc-bin gdb qemu-system xorriso -y
 

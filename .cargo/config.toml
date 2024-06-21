@@ -7,4 +7,4 @@ target = "x86_64-reenix.json"
 
 [target.x86_64-reenix]
 rustflags = ["-C", "link-args=-Tsrc/linker.ld"]
-runner = "echo lmao"
+runner = "scripts/reenix"
