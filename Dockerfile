@@ -15,6 +15,9 @@ RUN apt-get update && apt-get upgrade -y \
 
 RUN apt-get update
 
+# Set umask so that you can edit files created inside the Docker container outside of the container
+RUN echo "umask 000" >> /etc/profile.d/set-umask-for-all-users.sh
+
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
@@ -26,7 +29,7 @@ RUN rustup default nightly
 RUN rustup component add rust-src
 
 # Install other Weenix dependencies
-RUN apt-get install grub2-common grub-pc-bin gdb qemu-system xorriso -y
+RUN apt-get install xterm grub2-common grub-pc-bin gdb qemu-system xorriso -y
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 

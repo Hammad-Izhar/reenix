@@ -12,3 +12,8 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
+x86_64 = "0.15.1"
+
+[lib]
+name = "reenix"
+path = "src/reenix.rs"

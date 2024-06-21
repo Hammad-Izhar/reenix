@@ -5,7 +5,9 @@ cp target/x86_64-reenix/debug/reenix iso/boot
 # Rename the executable
 mv iso/boot/reenix iso/boot/reenix.bin
 
-# Create the iso
+Create the iso
 grub-mkrescue -o iso/reenix.iso iso
 
-qemu-system-x86_64 -cdrom iso/reenix.iso -k en-us -boot order=dca -vga std -machine q35 -serial stdio
+xterm -geometry 100x30+50+50 -bg black -fn 10x20 \
+    -title "Reenix Serial" \
+    -e "qemu-system-x86_64 -cdrom iso/reenix.iso -k en-us -boot order=dca -vga std -machine q35 -serial stdio"
