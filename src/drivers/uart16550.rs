@@ -1,9 +1,13 @@
-use core::fmt::{Error, Write};
+use core::{
+    arch::asm,
+    fmt::{Error, Write},
+};
 
 use x86_64::instructions::port::Port;
 
 #[derive(Debug)]
 pub struct SerialDriver {
+    port: u16,
     rx_tx_port: Port<u8>,
     int_enable_reg: Port<u8>,
     fifo_ctrl_reg: Port<u8>,
@@ -17,6 +21,7 @@ pub struct SerialDriver {
 impl SerialDriver {
     pub const unsafe fn new(port: u16) -> SerialDriver {
         SerialDriver {
+            port,
             rx_tx_port: Port::new(port),
             int_enable_reg: Port::new(port + 1),
             fifo_ctrl_reg: Port::new(port + 2),
@@ -38,16 +43,22 @@ impl SerialDriver {
     pub fn init(&mut self) -> Result<(), ()> {
         unsafe {
             // Disable all interrupts
-            self.int_enable_reg.write(0x00);
+            // self.int_enable_reg.write(0x00);
+            asm!("out dx, al", in("dx") self.port, in("al") 0x00 as u8);
             // Enable DLAB (set baud rate divisor)
-            self.line_ctrl_reg.write(0x80);
+            // self.line_ctrl_reg.write(0x80);
+            asm!("out dx, al", in("dx") self.port + 3, in("al") 0x80 as u8);
             // Set baud rate
-            self.rx_tx_port.write(0x03);
-            self.int_enable_reg.write(0x00);
+            // self.rx_tx_port.write(0x03);
+            asm!("out dx, al", in("dx") self.port, in("al") 0x03 as u8);
+            // self.int_enable_reg.write(0x00);
+            asm!("out dx, al", in("dx") self.port + 1, in("al") 0x00 as u8);
             // 8 bits, no parity, one stop bit
-            self.line_ctrl_reg.write(0x03);
+            // self.line_ctrl_reg.write(0x03);
+            asm!("out dx, al", in("dx") self.port + 3, in("al") 0x03 as u8);
             // Enable FIFO, clear, with 14-byte threshold
-            self.fifo_ctrl_reg.write(0xC7);
+            // self.fifo_ctrl_reg.write(0xC7);
+            asm!("out dx, al", in("dx") self.port + 2, in("al") 0xC7 as u8);
         }
 
         Ok(())

@@ -33,8 +33,8 @@
     _start:
         cli
 
-        mov esp, KERNEL_STACK_START_PA
-        mov ebp, KERNEL_STACK_START_PA
+        mov esp, offset KERNEL_STACK_START_PA
+        mov ebp, offset KERNEL_STACK_START_PA
 
         call setup_page_tables
         call enable_paging
@@ -44,12 +44,12 @@
         ljmp 0x8, offset _start64
 
     setup_page_tables:
-        mov eax, PDPT_PA
+        mov eax, offset PDPT_PA
         or eax, 0b11
         mov [PML4_PA], eax
         mov [PML4_PA + 3 * 8], eax
 
-        mov eax, PDT_PA
+        mov eax, offset PDT_PA
         or eax, 0b11
         mov [PDPT_PA], eax
         
@@ -66,8 +66,8 @@
 
         ret
 
-    enable_paging:
-        mov eax, PML4_PA
+    enable_paging:offset
+        mov eax, offset PML4_PA
         mov cr3, eax
 
         mov eax, cr4
