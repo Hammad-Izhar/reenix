@@ -47,11 +47,11 @@
         mov eax, offset PDPT_PA
         or eax, 0b11
         mov [PML4_PA], eax
-        mov [PML4_PA + 3 * 8], eax
 
         mov eax, offset PDT_PA
         or eax, 0b11
         mov [PDPT_PA], eax
+        mov [PDPT_PA + 3 * 8], eax
         
         mov ecx, 0
         .map_pdt:
@@ -66,7 +66,7 @@
 
         ret
 
-    enable_paging:offset
+    enable_paging:
         mov eax, offset PML4_PA
         mov cr3, eax
 
@@ -95,4 +95,13 @@
     
     .code64
     _start64:
+        mov ax, 0
+        mov ss, ax
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+
+        .extern kmain
+        call kmain
         call error
