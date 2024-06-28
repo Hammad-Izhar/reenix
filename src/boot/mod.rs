@@ -1,4 +1,4 @@
-#[repr(C)]
+#[repr(C, align(8))]
 pub struct Multiboot2Header {
     /// Magic number that a Multiboot-2 compliant bootloader looks for to identify the header
     /// Must be set to 0xE85250D6
@@ -13,7 +13,7 @@ pub struct Multiboot2Header {
     end_tag: MultibootEndTag,
 }
 
-#[repr(C)]
+#[repr(C, align(8))]
 struct MultibootEndTag {
     tag_type: u16,
     flags: u16,

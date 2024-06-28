@@ -1,13 +1,46 @@
 #!/bin/bash
+
+debug=0
+new_disk=0
+while test $# != 0
+do
+    case "$1" in
+    -d|--debug) debug=1 ;;
+    -n|--new-disk)new_disk=1 ;;
+    esac
+    shift
+done
+
+QEMU_FLAGS="-cdrom iso/reenix.iso -d int -no-reboot -k en-us -boot order=dca -vga std -machine q35 -serial stdio 2> test"
+if [[ $debug == 1 ]]; then
+    QEMU_FLAGS="$QEMU_FLAGS -s -S"
+fi
+
+BINARY_PATH=target/x86_64-reenix/debug
+ISO_PATH=iso
+
+# Strip debug symbols
+if readelf -S "$BINARY_PATH/reenix" | grep -q '.debug_info'; then
+    echo "Stripping debug symbols"
+    objcopy --only-keep-debug "$BINARY_PATH/reenix" "$BINARY_PATH/reenix.debug"
+    objcopy --strip-unneeded "$BINARY_PATH/reenix"
+    objcopy --add-gnu-debuglink="$BINARY_PATH/reenix.debug" "$BINARY_PATH/reenix"
+fi
+
+
 # Move the executable to the GRUB iso directory
-cp target/x86_64-reenix/debug/reenix iso/boot
+cp "$BINARY_PATH/reenix" iso/boot
 
 # Rename the executable
-mv iso/boot/reenix iso/boot/reenix.bin
+mv "$ISO_PATH/boot/reenix" "$ISO_PATH/boot/reenix.bin"
 
-Create the iso
-grub-mkrescue -o iso/reenix.iso iso
+# Create the iso
+rm -f "$ISO_PATH/reenix.iso"
+grub-mkrescue -o "$ISO_PATH/reenix.iso" iso
 
-xterm -geometry 100x30+50+50 -bg black -fn 10x20 \
-    -title "Reenix Serial" \
-    -e "qemu-system-x86_64 -cdrom iso/reenix.iso -k en-us -boot order=dca -vga std -machine q35 -serial stdio"
+if [[ $debug == 1 ]]; then
+    xterm -geometry 100x30+50+50 -bg black -fn 10x20 \
+        -title "Reenix Serial" \
+        -e "qemu-system-x86_64 $QEMU_FLAGS" &
+    rust-gdb "$BINARY_PATH/reenix" -x gdb/preinit.gdb
+fi

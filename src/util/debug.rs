@@ -1,9 +1,10 @@
-use crate::drivers::uart16550::SerialDriver;
+// use crate::drivers::uart16550::SerialDriver;
+use uart_16550::SerialPort;
 
 // TODO: Make Synchronization Safe
 
 /// QEMU COM1 serial port is at 0x3F8 which we'll use as a debug port.
-pub static mut COM1: SerialDriver = unsafe { SerialDriver::new(0x3F8) };
+pub static mut COM1: SerialPort = unsafe { SerialPort::new(0x3F8) };
 
 pub enum DebugMode {
     Panic,
@@ -11,7 +12,7 @@ pub enum DebugMode {
 
 pub fn dbg_init() {
     unsafe {
-        COM1.init().unwrap();
+        COM1.init();
     }
 }
 

@@ -12,6 +12,7 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
+uart_16550 = "0.3.0"
 x86_64 = "0.15.1"
 
 [lib]

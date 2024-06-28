@@ -1,0 +1,146 @@
+
+target/x86_64-reenix/debug/reenix:     file format elf64-x86-64
+
+
+Disassembly of section .multiboot:
+
+0000000000100000 <MULTIBOOT2_HEADER>:
+  100000:	d6                   	(bad)  
+  100001:	50                   	push   %rax
+  100002:	52                   	push   %rdx
+  100003:	e8 00 00 00 00       	call   100008 <MULTIBOOT2_HEADER+0x8>
+  100008:	18 00                	sbb    %al,(%rax)
+  10000a:	00 00                	add    %al,(%rax)
+  10000c:	12 af ad 17 00 00    	adc    0x17ad(%rdi),%ch
+  100012:	00 00                	add    %al,(%rax)
+  100014:	08 00                	or     %al,(%rax)
+	...
+
+Disassembly of section .text:
+
+00000000c0101000 <_start>:
+    c0101000:	fa                   	cli    
+    c0101001:	8b 25 00 70 10 00    	mov    0x107000(%rip),%esp        # c0208007 <__bss_end+0x101007>
+    c0101007:	8b 2d 00 70 10 00    	mov    0x107000(%rip),%ebp        # c020800d <__bss_end+0x10100d>
+    c010100d:	e8 13 00 00 00       	call   c0101025 <setup_page_tables>
+    c0101012:	e8 4f 00 00 00       	call   c0101066 <enable_paging>
+    c0101017:	0f 01 15 10 20 10 c0 	lgdt   -0x3fefdff0(%rip)        # 8020302e <KERNEL_STACK_START_PA+0x800fc02e>
+    c010101e:	ea                   	(bad)  
+    c010101f:	ba 10 10 c0 08       	mov    $0x8c01010,%edx
+	...
+
+00000000c0101025 <setup_page_tables>:
+    c0101025:	a1 00 40 10 00 83 c8 	movabs 0xa303c88300104000,%eax
+    c010102c:	03 a3 
+    c010102e:	00 30                	add    %dh,(%rax)
+    c0101030:	10 00                	adc    %al,(%rax)
+    c0101032:	a3 18 30 10 00 a1 00 	movabs %eax,0x105000a100103018
+    c0101039:	50 10 
+    c010103b:	00 83 c8 03 a3 00    	add    %al,0xa303c8(%rbx)
+    c0101041:	40 10 00             	rex adc %al,(%rax)
+    c0101044:	b9 00 00 00 00       	mov    $0x0,%ecx
+
+00000000c0101049 <.map_pdt>:
+    c0101049:	b8 00 00 20 00       	mov    $0x200000,%eax
+    c010104e:	f7 e1                	mul    %ecx
+    c0101050:	0d 83 00 00 00       	or     $0x83,%eax
+    c0101055:	89 04 cd 00 50 10 00 	mov    %eax,0x105000(,%rcx,8)
+    c010105c:	41 81 f9 00 02 00 00 	cmp    $0x200,%r9d
+    c0101063:	75 e4                	jne    c0101049 <.map_pdt>
+    c0101065:	c3                   	ret    
+
+00000000c0101066 <enable_paging>:
+    c0101066:	a1 00 30 10 00 0f 22 	movabs 0xfd8220f00103000,%eax
+    c010106d:	d8 0f 
+    c010106f:	20 e0                	and    %ah,%al
+    c0101071:	83 c8 20             	or     $0x20,%eax
+    c0101074:	0f 22 e0             	mov    %rax,%cr4
+    c0101077:	b9 80 00 00 c0       	mov    $0xc0000080,%ecx
+    c010107c:	0f 32                	rdmsr  
+    c010107e:	0d 00 01 00 00       	or     $0x100,%eax
+    c0101083:	0f 30                	wrmsr  
+    c0101085:	0f 20 c0             	mov    %cr0,%rax
+    c0101088:	0d 00 00 00 80       	or     $0x80000000,%eax
+    c010108d:	0f 22 c0             	mov    %rax,%cr0
+    c0101090:	e8 01 00 00 00       	call   c0101096 <error>
+    c0101095:	c3                   	ret    
+
+00000000c0101096 <error>:
+    c0101096:	c7 05 00 80 0b 00 45 	movl   $0x4f524f45,0xb8000(%rip)        # c01b90a0 <__bss_end+0xb20a0>
+    c010109d:	4f 52 4f 
+    c01010a0:	c7 05 04 80 0b 00 52 	movl   $0x4f3a4f52,0xb8004(%rip)        # c01b90ae <__bss_end+0xb20ae>
+    c01010a7:	4f 3a 4f 
+    c01010aa:	c7 05 08 80 0b 00 20 	movl   $0x4f204f20,0xb8008(%rip)        # c01b90bc <__bss_end+0xb20bc>
+    c01010b1:	4f 20 4f 
+    c01010b4:	a2                   	.byte 0xa2
+    c01010b5:	0a                   	.byte 0xa
+    c01010b6:	80 0b 00             	orb    $0x0,(%rbx)
+    c01010b9:	f4                   	hlt    
+
+Disassembly of section .rodata:
+
+00000000c0102000 <gdt64>:
+	...
+    c010200c:	00 98 20 00      	add    %bl,0xf0020(%rax)
+
+00000000c0102010 <gdt64_pointer>:
+    c0102010:	0f 00 00             	sldt   (%rax)
+    c0102013:	20 10                	and    %dl,(%rax)
+    c0102015:	00 00                	add    %al,(%rax)
+    c0102017:	00 00                	add    %al,(%rax)
+	...
+
+Disassembly of section .bss:
+
+00000000c0103000 <pml4>:
+	...
+
+00000000c0104000 <pdpt>:
+	...
+
+00000000c0105000 <pdt>:
+	...
+
+00000000c0106000 <__kernel_stack_end>:
+	...
+
+Disassembly of section .comment:
+
+0000000000000000 <.comment>:
+   0:	4c 69 6e 6b 65 72 3a 	imul   $0x203a7265,0x6b(%rsi),%r13
+   7:	20 
+   8:	4c                   	rex.WR
+   9:	4c                   	rex.WR
+   a:	44 20 31             	and    %r14b,(%rcx)
+   d:	38 2e                	cmp    %ch,(%rsi)
+   f:	31 2e                	xor    %ebp,(%rsi)
+  11:	37                   	(bad)  
+  12:	00 00                	add    %al,(%rax)
+  14:	72 75                	jb     8b <KERNEL_STACK_SIZE-0xf75>
+  16:	73 74                	jae    8c <KERNEL_STACK_SIZE-0xf74>
+  18:	63 20                	movsxd (%rax),%esp
+  1a:	76 65                	jbe    81 <KERNEL_STACK_SIZE-0xf7f>
+  1c:	72 73                	jb     91 <KERNEL_STACK_SIZE-0xf6f>
+  1e:	69 6f 6e 20 31 2e 38 	imul   $0x382e3120,0x6e(%rdi),%ebp
+  25:	31 2e                	xor    %ebp,(%rsi)
+  27:	30 2d 6e 69 67 68    	xor    %ch,0x6867696e(%rip)        # 6867699b <KERNEL_STACK_START_PA+0x6856f99b>
+  2d:	74 6c                	je     9b <KERNEL_STACK_SIZE-0xf65>
+  2f:	79 20                	jns    51 <KERNEL_STACK_SIZE-0xfaf>
+  31:	28 36                	sub    %dh,(%rsi)
+  33:	38 34 62             	cmp    %dh,(%rdx,%riz,2)
+  36:	33 35 35 33 66 20    	xor    0x20663335(%rip),%esi        # 20663371 <KERNEL_STACK_START_PA+0x2055c371>
+  3c:	32 30                	xor    (%rax),%dh
+  3e:	32 34 2d 30 36 2d 32 	xor    0x322d3630(,%rbp,1),%dh
+  45:	30 29                	xor    %ch,(%rcx)
+	...
+
+Disassembly of section .gnu_debuglink:
+
+0000000000000000 <.gnu_debuglink>:
+   0:	72 65                	jb     67 <KERNEL_STACK_SIZE-0xf99>
+   2:	65 6e                	outsb  %gs:(%rsi),(%dx)
+   4:	69 78 2e 64 65 62 75 	imul   $0x75626564,0x2e(%rax),%edi
+   b:	67 00 00             	add    %al,(%eax)
+   e:	00 00                	add    %al,(%rax)
+  10:	26 e4 90             	es in  $0x90,%al
+  13:	d4                   	(bad)  

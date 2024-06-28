@@ -29,7 +29,8 @@ RUN rustup default nightly
 RUN rustup component add rust-src
 
 # Install other Weenix dependencies
-RUN apt-get install xterm grub2-common grub-pc-bin gdb qemu-system xorriso -y
+RUN apt-get update && apt-get upgrade
+RUN apt-get install xterm gdb grub2-common grub-pc-bin qemu-system xorriso -y
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
