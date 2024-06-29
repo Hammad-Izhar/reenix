@@ -6,7 +6,10 @@ mod drivers;
 mod sync;
 mod util;
 
-use core::{arch::global_asm, panic::PanicInfo};
+use core::{
+    arch::{asm, global_asm},
+    panic::PanicInfo,
+};
 
 use util::debug::DebugMode;
 
@@ -16,12 +19,14 @@ global_asm!(include_str!("boot/boot.S"));
 pub extern "C" fn kmain() -> ! {
     util::debug::dbg_init();
 
-    loop {}
+    core::unreachable!("Unexpectedly returned to kmain")
 }
 
 #[panic_handler]
 fn panic_handler(info: &PanicInfo) -> ! {
     dbg_println!(DebugMode::Error, "{}", info);
 
-    loop {}
+    loop {
+        unsafe { asm!("cli; hlt") }
+    }
 }
