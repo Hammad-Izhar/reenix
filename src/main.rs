@@ -3,6 +3,7 @@
 
 mod boot;
 mod drivers;
+mod sync;
 mod util;
 
 use core::{arch::global_asm, panic::PanicInfo};
@@ -12,7 +13,7 @@ use util::debug::DebugMode;
 global_asm!(include_str!("boot/boot.S"));
 
 #[no_mangle]
-pub extern "C" fn kmain() {
+pub extern "C" fn kmain() -> ! {
     util::debug::dbg_init();
 
     loop {}

@@ -17,3 +17,6 @@ yansi = { version = "1.0.1", default-features = false }
 [lib]
 name = "reenix"
 path = "src/reenix.rs"
+
+[features]
+proc_logging = []
