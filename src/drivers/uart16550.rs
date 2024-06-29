@@ -1,36 +1,50 @@
-use core::{
-    arch::asm,
-    fmt::{Error, Write},
-};
+use core::fmt::{Error, Write};
 
-use x86_64::instructions::port::Port;
+use crate::util::io::{inb, outb};
 
 #[derive(Debug)]
 pub struct SerialDriver {
     port: u16,
-    rx_tx_port: Port<u8>,
-    int_enable_reg: Port<u8>,
-    fifo_ctrl_reg: Port<u8>,
-    line_ctrl_reg: Port<u8>,
-    modem_ctrl_reg: Port<u8>,
-    line_status_reg: Port<u8>,
-    modem_status_reg: Port<u8>,
-    scratch_reg: Port<u8>,
 }
 
 impl SerialDriver {
     pub const unsafe fn new(port: u16) -> SerialDriver {
-        SerialDriver {
-            port,
-            rx_tx_port: Port::new(port),
-            int_enable_reg: Port::new(port + 1),
-            fifo_ctrl_reg: Port::new(port + 2),
-            line_ctrl_reg: Port::new(port + 3),
-            modem_ctrl_reg: Port::new(port + 4),
-            line_status_reg: Port::new(port + 5),
-            modem_status_reg: Port::new(port + 6),
-            scratch_reg: Port::new(port + 7),
-        }
+        SerialDriver { port }
+    }
+
+    fn rx_tx_port(&self) -> u16 {
+        self.port
+    }
+
+    fn int_enable_reg(&self) -> u16 {
+        self.port + 1
+    }
+
+    fn fifo_ctrl_reg(&self) -> u16 {
+        self.port + 2
+    }
+
+    fn line_ctrl_reg(&self) -> u16 {
+        self.port + 3
+    }
+
+    #[allow(dead_code)]
+    fn modem_ctl_reg(&self) -> u16 {
+        self.port + 4
+    }
+
+    fn line_status_reg(&self) -> u16 {
+        self.port + 5
+    }
+
+    #[allow(dead_code)]
+    fn modem_status_reg(&self) -> u16 {
+        self.port + 6
+    }
+
+    #[allow(dead_code)]
+    fn scratch_reg(&self) -> u16 {
+        self.port + 6
     }
 
     /// Inialize the device by specifing the baud rate and other settings.
@@ -41,34 +55,24 @@ impl SerialDriver {
     /// 4. Set the data format to 8 bits, no parity, one stop bit
     /// 5. Enable the FIFO buffer, clear it, and set a 14-byte threshold
     pub fn init(&mut self) -> Result<(), ()> {
-        unsafe {
-            // Disable all interrupts
-            // self.int_enable_reg.write(0x00);
-            asm!("out dx, al", in("dx") self.port, in("al") 0x00 as u8);
-            // Enable DLAB (set baud rate divisor)
-            // self.line_ctrl_reg.write(0x80);
-            asm!("out dx, al", in("dx") self.port + 3, in("al") 0x80 as u8);
-            // Set baud rate
-            // self.rx_tx_port.write(0x03);
-            asm!("out dx, al", in("dx") self.port, in("al") 0x03 as u8);
-            // self.int_enable_reg.write(0x00);
-            asm!("out dx, al", in("dx") self.port + 1, in("al") 0x00 as u8);
-            // 8 bits, no parity, one stop bit
-            // self.line_ctrl_reg.write(0x03);
-            asm!("out dx, al", in("dx") self.port + 3, in("al") 0x03 as u8);
-            // Enable FIFO, clear, with 14-byte threshold
-            // self.fifo_ctrl_reg.write(0xC7);
-            asm!("out dx, al", in("dx") self.port + 2, in("al") 0xC7 as u8);
-        }
+        // Disable all interrupts
+        outb(self.int_enable_reg(), 0x00);
+        // Enable DLAB (set baud rate divisor)
+        outb(self.line_ctrl_reg(), 0x80);
+        // Set baud rate
+        outb(self.rx_tx_port(), 0x03);
+        outb(self.int_enable_reg(), 0x00);
+        // 8 bits, no parity, one stop bit
+        outb(self.line_ctrl_reg(), 0x03);
+        // Enable FIFO, clear, with 14-byte threshold
+        outb(self.fifo_ctrl_reg(), 0xC7);
 
         Ok(())
     }
 
     pub fn write_byte(&mut self, byte: u8) {
-        unsafe {
-            while self.line_status_reg.read() & 0x20 == 0 {}
-            self.rx_tx_port.write(byte);
-        }
+        while inb(self.line_status_reg()) & 0x20 == 0 {}
+        outb(self.rx_tx_port(), byte);
     }
 
     pub fn write(&mut self, data: &[u8]) {

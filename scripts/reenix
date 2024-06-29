@@ -11,7 +11,7 @@ do
     shift
 done
 
-QEMU_FLAGS="-cdrom iso/reenix.iso -d int -no-reboot -k en-us -boot order=dca -vga std -machine q35 -serial stdio 2> test"
+QEMU_FLAGS="-cdrom iso/reenix.iso -no-reboot -k en-us -boot order=dca -vga std -machine q35 -serial stdio"
 if [[ $debug == 1 ]]; then
     QEMU_FLAGS="$QEMU_FLAGS -s -S"
 fi
@@ -42,5 +42,9 @@ if [[ $debug == 1 ]]; then
     xterm -geometry 100x30+50+50 -bg black -fn 10x20 \
         -title "Reenix Serial" \
         -e "qemu-system-x86_64 $QEMU_FLAGS" &
-    rust-gdb "$BINARY_PATH/reenix" -x gdb/preinit.gdb
+    rust-gdb "$BINARY_PATH/reenix" -x gdb/init.gdb
+else
+    qemu-system-x86_64 $QEMU_FLAGS
 fi
+
+pkill qemu
