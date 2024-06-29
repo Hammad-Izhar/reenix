@@ -12,6 +12,7 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
+yansi = { version = "1.0.1", default-features = false }
 
 [lib]
 name = "reenix"
