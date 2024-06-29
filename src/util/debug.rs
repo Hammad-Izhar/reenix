@@ -112,3 +112,38 @@ macro_rules! dbg_println {
         );
     }};
 }
+
+#[macro_export]
+macro_rules! trace {
+    ($($arg:tt)*) => {
+        $crate::dbg_println!($crate::util::debug::DebugMode::Trace, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! debug {
+    ($($arg:tt)*) => {
+        $crate::dbg_println!($crate::util::debug::DebugMode::Debug, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! info {
+    ($($arg:tt)*) => {
+        $crate::dbg_println!($crate::util::debug::DebugMode::Info, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! warn {
+    ($($arg:tt)*) => {
+        $crate::dbg_println!($crate::util::debug::DebugMode::Warn, $($arg)*);
+    };
+}
+
+#[macro_export]
+macro_rules! error {
+    ($($arg:tt)*) => {
+        $crate::dbg_println!($crate::util::debug::DebugMode::Error, $($arg)*);
+    };
+}

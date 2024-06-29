@@ -95,6 +95,10 @@
     
     .code64
     _start64:
+        mov rax, KERNEL_OFFSET
+        add rsp, rax
+        add rbp, rax
+
         mov ax, 0
         mov ss, ax
         mov ds, ax

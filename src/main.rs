@@ -15,10 +15,6 @@ global_asm!(include_str!("boot/boot.S"));
 pub extern "C" fn kmain() {
     util::debug::dbg_init();
 
-    dbg_println!(DebugMode::Error);
-    dbg_println!(DebugMode::Error, "Hello, World!");
-    dbg_println!(DebugMode::Error, "{}, World!", "Hello");
-
     loop {}
 }
 
